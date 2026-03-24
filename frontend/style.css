@@ -1,0 +1,93 @@
+body {
+    margin: 0;
+    font-family: 'Segoe UI', sans-serif;
+    background: #f4f7fb;
+}
+
+.container {
+    text-align: center;
+    padding: 30px;
+}
+
+h1 {
+    color: #2c3e50;
+}
+
+.subtitle {
+    color: #7f8c8d;
+}
+
+.card {
+    background: white;
+    padding: 20px;
+    margin: 20px auto;
+    width: 400px;
+    border-radius: 12px;
+    box-shadow: 0px 5px 15px rgba(0,0,0,0.1);
+}
+
+.upload-box {
+    display: block;
+    border: 2px dashed #3498db;
+    padding: 30px;
+    cursor: pointer;
+    border-radius: 10px;
+    color: #3498db;
+    margin-bottom: 15px;
+}
+
+.upload-box:hover {
+    background: #ecf6ff;
+}
+
+button {
+    background: #27ae60;
+    color: white;
+    border: none;
+    padding: 12px 20px;
+    border-radius: 8px;
+    cursor: pointer;
+    width: 100%;
+}
+
+button:hover {
+    background: #219150;
+}
+
+img {
+    width: 100%;
+    margin-top: 15px;
+    border-radius: 10px;
+}
+
+.hidden {
+    display: none;
+}
+
+.results {
+    margin-top: 15px;
+}
+
+.badge {
+    display: inline-block;
+    background: #3498db;
+    color: white;
+    padding: 8px 12px;
+    border-radius: 20px;
+    margin: 5px;
+    font-size: 14px;
+}
+
+.loader {
+    border: 5px solid #f3f3f3;
+    border-top: 5px solid #27ae60;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    margin: 15px auto;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    100% { transform: rotate(360deg); }
+}

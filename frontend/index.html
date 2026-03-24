@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Groundnut Disease Detection</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="container">
+    <h1>🌱 Groundnut Disease Detection</h1>
+    <p class="subtitle">Upload a leaf image to detect diseases</p>
+    <div class="card">
+        <input type="file" id="imageInput" hidden>
+        <label for="imageInput" class="upload-box">
+            <span>📁 Click to upload image</span>
+        </label>
+        <img id="preview" class="hidden"/>
+        <button onclick="uploadImage()">Detect Disease</button>
+        <div id="loader" class="loader hidden"></div>
+    </div>
+    <div class="card result-card hidden" id="resultCard">
+        <h2>Detection Result</h2>
+        <img id="outputImage"/>
+        <div id="results" class="results"></div>
+    </div>
+</div>
+<script src="script.js"></script>
+</body>
+</html>
