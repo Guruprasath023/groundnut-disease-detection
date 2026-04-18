@@ -9,6 +9,7 @@
 <div class="container">
     <h1>🌱 Groundnut Disease Detection</h1>
     <p class="subtitle">Upload a leaf image to detect diseases</p>
+    <div id="connectionStatus" class="connection-status"></div>
     <div class="card">
         <input type="file" id="imageInput" hidden>
         <label for="imageInput" class="upload-box">
@@ -16,6 +17,7 @@
         </label>
         <img id="preview" class="hidden"/>
         <button onclick="uploadImage()">Detect Disease</button>
+        <button onclick="preloadModel()" id="preloadBtn" style="margin-top: 10px; background: #3498db;">Pre-load Model (1-2 min)</button>
         <div id="loader" class="loader hidden"></div>
     </div>
     <div class="card result-card hidden" id="resultCard">

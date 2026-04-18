@@ -17,6 +17,12 @@ h1 {
     color: #7f8c8d;
 }
 
+.connection-status {
+    margin: 10px 0;
+    font-size: 14px;
+    min-height: 20px;
+}
+
 .card {
     background: white;
     padding: 20px;
@@ -82,12 +88,24 @@ img {
     border: 5px solid #f3f3f3;
     border-top: 5px solid #27ae60;
     border-radius: 50%;
-    width: 40px;
-    height: 40px;
+    width: 50px;
+    height: 50px;
     margin: 15px auto;
     animation: spin 1s linear infinite;
 }
 
+#loaderText {
+    color: #27ae60;
+    font-weight: bold;
+    font-size: 14px;
+    animation: pulse 1.5s ease-in-out infinite;
+}
+
 @keyframes spin {
     100% { transform: rotate(360deg); }
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.6; }
 }
