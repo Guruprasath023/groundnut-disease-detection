@@ -16,7 +16,7 @@ def load_model():
     if model is None:
         print("Loading YOLO model...")
         from ultralytics import YOLO
-        model = YOLO("https://drive.google.com/file/d/1mxAqGvAyw5A66QgvDie2BbN4wMV2DwHN/view?usp=sharing")
+        model = YOLO("https://huggingface.co/guru162006/groundnut-model/resolve/main/best.pt")
         print("Model loaded!")
     return model
 
