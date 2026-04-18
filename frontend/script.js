@@ -3,27 +3,38 @@ const preview = document.getElementById("preview");
 const loader = document.getElementById("loader");
 const resultCard = document.getElementById("resultCard");
 
+// 🔥 CHANGE THIS ONLY IF YOUR BACKEND URL CHANGES
+const BASE_URL = "https://groundnut-disease-detection.onrender.com";
+
 // Check connection on page load
 document.addEventListener("DOMContentLoaded", () => {
     checkConnection();
 });
 
 async function checkConnection() {
+    const status = document.getElementById("connectionStatus");
+
     try {
-        let response = await fetch("http://127.0.0.1:5000/health");
+        let response = await fetch(`${BASE_URL}/health`);
         let data = await response.json();
-        
-        const status = document.getElementById("connectionStatus");
+
         if (data.status === "ok") {
-            const modelStatus = data.model_loaded ? "✅ Ready" : "⏳ Model not loaded yet";
-            status.innerHTML = `<span style="color: #27ae60; font-weight: bold;">✓ Server connected - ${modelStatus}</span>`;
+            const modelStatus = data.model_loaded
+                ? "✅ Ready"
+                : "⏳ Model not loaded yet";
+
+            status.innerHTML = `<span style="color: #27ae60; font-weight: bold;">
+                ✓ Server connected - ${modelStatus}
+            </span>`;
         }
     } catch (error) {
-        const status = document.getElementById("connectionStatus");
-        status.innerHTML = `<span style="color: #e74c3c; font-weight: bold;">✗ Server not reachable</span>`;
+        status.innerHTML = `<span style="color: #e74c3c; font-weight: bold;">
+            ✗ Server not reachable
+        </span>`;
     }
 }
 
+// Image preview
 input.addEventListener("change", () => {
     const file = input.files[0];
     if (file) {
@@ -32,53 +43,74 @@ input.addEventListener("change", () => {
     }
 });
 
-async function preloadModel() {
+// Helper: show loader text
+function showLoader(text) {
     loader.classList.remove("hidden");
-    resultCard.classList.add("hidden");
+
+    let existing = document.getElementById("loaderText");
+    if (existing) existing.remove();
 
     let loaderText = document.createElement("p");
     loaderText.id = "loaderText";
     loaderText.style.textAlign = "center";
     loaderText.style.marginTop = "10px";
-    loaderText.innerText = "Loading model... This may take 1-2 minutes on first load";
+    loaderText.innerText = text;
+
     loader.parentElement.appendChild(loaderText);
+}
+
+// Helper: hide loader
+function hideLoader() {
+    loader.classList.add("hidden");
+    let loaderText = document.getElementById("loaderText");
+    if (loaderText) loaderText.remove();
+}
+
+// 🔥 Preload model (sends tiny valid image)
+async function preloadModel() {
+    showLoader("Loading model... This may take 1-2 minutes");
 
     try {
-        // Set timeout to 3 minutes
         const controller = new AbortController();
         const timeoutId = setTimeout(() => controller.abort(), 180000);
 
-        // Send a dummy request to trigger model loading
-        let formData = new FormData();
-        formData.append("image", new Blob([]), "dummy.jpg");
+        // Tiny 1x1 pixel image (valid JPEG)
+        const tinyImage = new Uint8Array([
+            255, 216, 255, 217
+        ]);
+        let blob = new Blob([tinyImage], { type: "image/jpeg" });
 
-        let response = await fetch("http://127.0.0.1:5000/predict", {
+        let formData = new FormData();
+        formData.append("image", blob, "tiny.jpg");
+
+        let response = await fetch(`${BASE_URL}/predict`, {
             method: "POST",
             body: formData,
             signal: controller.signal
         });
 
         clearTimeout(timeoutId);
+        hideLoader();
 
-        loader.classList.add("hidden");
-        loaderText.remove();
+        if (!response.ok) {
+            throw new Error(`Server error: ${response.status}`);
+        }
 
-        alert("Model pre-loaded successfully! Now you can upload images for faster detection.");
+        alert("✅ Model pre-loaded successfully!");
         checkConnection();
 
     } catch (error) {
-        loader.classList.add("hidden");
-        const loaderTextElement = document.getElementById("loaderText");
-        if (loaderTextElement) loaderTextElement.remove();
+        hideLoader();
 
         if (error.name === "AbortError") {
-            alert("Pre-load timed out. Try again or upload an image directly (will be slower on first request).");
+            alert("⏱️ Pre-load timed out. Try again or upload an image directly.");
         } else {
-            alert("Error pre-loading model: " + error.message);
+            alert("❌ Error pre-loading model: " + error.message);
         }
     }
 }
 
+// 🔥 Upload image for prediction
 async function uploadImage() {
 
     if (input.files.length === 0) {
@@ -86,25 +118,17 @@ async function uploadImage() {
         return;
     }
 
-    loader.classList.remove("hidden");
+    showLoader("Detecting disease... Please wait");
     resultCard.classList.add("hidden");
-
-    let loaderText = document.createElement("p");
-    loaderText.id = "loaderText";
-    loaderText.style.textAlign = "center";
-    loaderText.style.marginTop = "10px";
-    loaderText.innerText = "Detecting disease... Please wait";
-    loader.parentElement.appendChild(loaderText);
 
     let formData = new FormData();
     formData.append("image", input.files[0]);
 
     try {
-        // Set timeout to 3 minutes for first request, 30 seconds for subsequent
         const controller = new AbortController();
         const timeoutId = setTimeout(() => controller.abort(), 180000);
 
-        let response = await fetch("http://127.0.0.1:5000/predict", {
+        let response = await fetch(`${BASE_URL}/predict`, {
             method: "POST",
             body: formData,
             signal: controller.signal
@@ -118,8 +142,7 @@ async function uploadImage() {
 
         let data = await response.json();
 
-        loader.classList.add("hidden");
-        loaderText.remove();
+        hideLoader();
         resultCard.classList.remove("hidden");
 
         // Show processed image
@@ -130,7 +153,7 @@ async function uploadImage() {
         let resultsDiv = document.getElementById("results");
         resultsDiv.innerHTML = "";
 
-        if (data.detections.length === 0) {
+        if (!data.detections || data.detections.length === 0) {
             resultsDiv.innerHTML = "<p>No disease detected</p>";
             return;
         }
@@ -141,19 +164,18 @@ async function uploadImage() {
             badge.innerText = `${d.class} (${d.confidence})`;
             resultsDiv.appendChild(badge);
         });
-        
+
         checkConnection();
 
     } catch (error) {
-        loader.classList.add("hidden");
-        const loaderTextElement = document.getElementById("loaderText");
-        if (loaderTextElement) loaderTextElement.remove();
-        
+        hideLoader();
+
         if (error.name === "AbortError") {
-            alert("Request timed out. The server may be slow. Please check if the backend is running or try again.");
+            alert("⏱️ Request timed out. Server may be slow or waking up.");
         } else {
-            alert("Error connecting to server: " + error.message);
+            alert("❌ Error connecting to server: " + error.message);
         }
+
         console.error(error);
     }
 }
